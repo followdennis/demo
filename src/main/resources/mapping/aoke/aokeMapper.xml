@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.dao.matchDao" >
+    <resultMap id="BaseResultMap" type="com.example.demo.model.Aoke" >
+        <id column="id" property="Id" jdbcType="INTEGER" />
+        <result column="num" property="num" jdbcType="VARCHAR" />
+        <result column="competition_name" property="competitionName" jdbcType="VARCHAR" />
+        <result column="host_team_name" property="hostTeamName" jdbcType="VARCHAR" />
+        <result column="guest_team_name" property="guestTeamName" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="getAokeList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+      select * from c_aoke
+      <if test=" search != null">
+          where competition_name like concat('%',#{search,jdbcType= VARCHAR},'%')
+          or host_team_name like concat('%',#{search,jdbcType=VARCHAR},'%')
+          or guest_team_name like concat('%',#{search,jdbcType=VARCHAR},'%')
+      </if>
+    </select>
+
+
+    <!-- 获取网易数据 -->
+    <select id="getWangyiData" resultType="com.example.demo.model.Wangyi">
+        select id as Id,
+        match_number as matchNum,
+        match_time as matchTime,
+        host_team_name as hostTeamName,
+        guest_team_name as guestTeamName
+        from c_source_wangyicaipiao order by id desc limit 20
+    </select>
+    <!--获取主队历史数据-->
+    <select id="getHostTeamHistoryList" resultType="com.example.demo.model.matchHistory" parameterType="java.lang.Integer">
+        select id as Id,
+        source_id as sourceId,
+        host_team_name as hostTeamName,
+        guest_team_name as guestTeamName,
+        host_score as hostScore,
+        guest_score as guestScore
+        from c_wangyi_host_history_score
+         where source_id = #{sourceId,jdbcType=INTEGER}
+         order by id desc
+    </select>
+    <!-- 获取客队历史数据 -->
+    <select id="getGuestTeamHistoryList" resultType="com.example.demo.model.matchHistory" parameterType="java.lang.Integer">
+        select id as Id,
+        source_id as sourceId,
+        host_team_name as hostTeamName,
+        guest_team_name as guestTeamName,
+        host_score as hostScore,
+        guest_score as guestScore
+        from c_wangyi_host_history_score
+         where source_id = #{sourceId,jdbcType=INTEGER}
+         order by id desc
+
+    </select>
+</mapper>
